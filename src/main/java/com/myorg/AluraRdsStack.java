@@ -1,9 +1,6 @@
 package com.myorg;
 
-import software.amazon.awscdk.CfnParameter;
-import software.amazon.awscdk.SecretValue;
-import software.amazon.awscdk.Stack;
-import software.amazon.awscdk.StackProps;
+import software.amazon.awscdk.*;
 import software.amazon.awscdk.services.ec2.*;
 import software.amazon.awscdk.services.ec2.InstanceType;
 import software.amazon.awscdk.services.rds.*;
@@ -29,6 +26,7 @@ public class AluraRdsStack extends Stack {
         ISecurityGroup iSecurityGroup = SecurityGroup.fromSecurityGroupId(this, id, vpc.getVpcDefaultSecurityGroup());
         iSecurityGroup.addIngressRule(Peer.anyIpv4(), Port.tcp(3306)); // entrada de qualquer ip dentro daquela vpc na porta 3306
 
+        // criação do banco de dados
         DatabaseInstance database = DatabaseInstance.Builder
                 .create(this, "Rds-pedidos")
                 .instanceIdentifier("alura-aws-pedido-db")
@@ -47,6 +45,17 @@ public class AluraRdsStack extends Stack {
                 .vpcSubnets(SubnetSelection.builder()
                         .subnets(vpc.getPrivateSubnets())
                         .build())
+                .build();
+
+        // cloud formation output. Exporta informações para outros stacks
+        CfnOutput.Builder.create(this, "pedidos-db-endpoint")
+                .exportName("pedidos-db-endpoint")
+                .value(database.getDbInstanceEndpointAddress())
+                .build();
+
+        CfnOutput.Builder.create(this, "pedidos-db-password")
+                .exportName("pedidos-db-password")
+                .value(password.getValueAsString())
                 .build();
     }
 }
