@@ -3,6 +3,8 @@ package com.myorg;
 import software.amazon.awscdk.Fn;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.StackProps;
+import software.amazon.awscdk.services.ecr.IRepository;
+import software.amazon.awscdk.services.ecr.Repository;
 import software.amazon.awscdk.services.ecs.Cluster;
 import software.amazon.awscdk.services.ecs.ContainerImage;
 import software.amazon.awscdk.services.ecs.patterns.ApplicationLoadBalancedFargateService;
@@ -30,7 +32,7 @@ public class AluraServiceStack extends Stack {
                 .assignPublicIp(true)
                 .taskImageOptions(
                         ApplicationLoadBalancedTaskImageOptions.builder()
-                                .image(ContainerImage.fromRegistry("jacquelineoliveira/ola1.0"))
+                                .image(ContainerImage.fromEcrRepository(getRepository()))
                                 .containerPort(8080)
                                 .containerName("app_ola")
                                 .environment(getAppEnv())
@@ -46,5 +48,9 @@ public class AluraServiceStack extends Stack {
                 "SPRING_DATASOURCE_USERNAME", "admin",
                 "SPRING_DATASOURCE_PASSWORD", Fn.importValue("pedidos-db-password")
         );
+    }
+
+    private IRepository getRepository() {
+        return Repository.fromRepositoryName(this, "Repository", "img-pedidos-ms");
     }
 }

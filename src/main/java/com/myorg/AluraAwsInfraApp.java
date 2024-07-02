@@ -25,4 +25,5 @@ public class AluraAwsInfraApp {
 fargate - menos trabalho que o ec2 para gerenciar.
 O ECS (Elastic Container Service) é uma solução da AWS que tem por objetivo facilitar o gerenciamento e disponibilização de aplicações conteinerizadas na nuvem. Esse serviço é composto por alguns recursos, como Container definition, Task definition, Service, Cluster e VPC.
 
+ECR - elastic container registry - sobe imagem docker em um repositorio privado, para que outras pessoas nao subam a imagem no dockerhub.
  */
