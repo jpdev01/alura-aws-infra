@@ -7,20 +7,15 @@ public class AluraAwsInfraApp {
     public static void main(final String[] args) {
         App app = new App();
 
-        final String vpcStackId = "Vpc";
-        AluraVpcStack vpcStack = new AluraVpcStack(app, vpcStackId);
+        AluraVpcStack vpcStack = new AluraVpcStack(app, "Vpc");
+        AluraClusterStack clusterStack = new AluraClusterStack(app, "Cluster", vpcStack.getVpc());
+        clusterStack.addDependency(vpcStack);
 
-        final String clusterStackId = "Cluster";
-        AluraClusterStack clusterStack = new AluraClusterStack(app, clusterStackId, vpcStack.getVpc());
-        clusterStack.addDependency(vpcStack); // cluster precisa que a vpc esteja criada antes do cluster
+        AluraRdsStack rdsStack = new AluraRdsStack(app, "Rds", vpcStack.getVpc());
+        rdsStack.addDependency(vpcStack);
 
-        final String rdsStackId = "Rds";
-        AluraRdsStack rdsStack = new AluraRdsStack(app, rdsStackId, vpcStack.getVpc());
-        rdsStack.addDependency(clusterStack); // rds precisa que o cluster esteja criado antes do rds
-
-        AluraServiceStack serviceStack = new AluraServiceStack(app, "Service", clusterStack.getCluster());
-        serviceStack.addDependency(clusterStack);
-
+        AluraServiceStack aluraServiceStack = new AluraServiceStack(app, "Service", clusterStack.getCluster());
+        aluraServiceStack.addDependency(clusterStack);
         app.synth();
     }
 }
