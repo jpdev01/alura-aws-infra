@@ -1,17 +1,21 @@
 package com.myorg;
 
 import software.amazon.awscdk.App;
-import software.amazon.awscdk.Environment;
-import software.amazon.awscdk.StackProps;
-
-import java.util.Arrays;
 
 public class AluraAwsInfraApp {
+
     public static void main(final String[] args) {
         App app = new App();
 
         final String vpcStackId = "Vpc";
-        new AluraVpcStack(app, vpcStackId);
+        AluraVpcStack vpcStack = new AluraVpcStack(app, vpcStackId);
+
+        final String clusterStackId = "Cluster";
+        AluraClusterStack clusterStack = new AluraClusterStack(app, clusterStackId, vpcStack.getVpc());
+        clusterStack.addDependency(vpcStack); // cluster precisa que a vpc esteja criada antes do cluster
+
+        AluraServiceStack serviceStack = new AluraServiceStack(app, "Service", clusterStack.getCluster());
+        serviceStack.addDependency(clusterStack);
 
         app.synth();
     }
